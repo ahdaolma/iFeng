@@ -83,6 +83,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.buildAnnotatedString
@@ -181,9 +182,8 @@ class MainActivity : ComponentActivity() {
             var isShowSplash by remember { mutableStateOf(!hasSplashBeenShown) }
 
             val systemTheme = isSystemInDarkTheme()
-            val isDarkModePersisted by context.dataStore.data
-                .map { it[IS_DARK_MODE] }
-                .collectAsState(initial = null)
+            val isDarkModePersistedFlow = remember { context.dataStore.data.map { it[IS_DARK_MODE] } }
+            val isDarkModePersisted by isDarkModePersistedFlow.collectAsState(initial = null)
             var isDarkMode by rememberSaveable { mutableStateOf(systemTheme) }
             var hasUserToggledTheme by remember { mutableStateOf(false) }
 
@@ -964,10 +964,22 @@ private fun SettingsBottomSheet(
         }
 
         // --- 3. 底部版本号落款 ---
-        Spacer(modifier = Modifier.height(32.dp))
-        
+        Spacer(modifier = Modifier.height(24.dp))
+
+        val uriHandler = LocalUriHandler.current
         Text(
-            text = "i风 v1.0",
+            text = "开源地址: https://github.com/ahdaolma/iFeng",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.clickable {
+                uriHandler.openUri("https://github.com/ahdaolma/iFeng")
+            }
+        )
+
+        Spacer(modifier = Modifier.height(4.dp))
+
+        Text(
+            text = "i风 v1.0.0",
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 16.dp),
